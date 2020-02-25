@@ -291,6 +291,7 @@ function dropdown_menu_clicked(element){
         }
         el.each(function(index){
             var idd = $(this).nextAll().eq(1).find('footer').attr('link-id');
+            var folder_ico = $(this).find('img').attr('src');
             html = `<div class="form-check">
             <input class="form-check-input" type="checkbox" value="check-box" id="multiple-select-box" check-id="${idd}" ${checked}>
             </div>`
@@ -302,7 +303,11 @@ function dropdown_menu_clicked(element){
                     fm.prop('checked', false);
                 }
             }else{
-                $(this).append(html);
+                if (folder_ico && folder_ico.includes('/folder.svg')){
+                    console.log("subfolder: excluding");
+                }else{
+                    $(this).append(html);
+                }
             }
         })
     }else if(link == 'move-multiple' || link == 'merge-bookmark-with'){
@@ -318,6 +323,22 @@ function dropdown_menu_clicked(element){
             var merge = true;
         }
         move_to_bookmark(post_data, api_link, nlink, csrftoken, elpar, elar_join, merge);
+    }else if(link == 'create-subdir'){
+        var api_link = $(element).attr('api-url');
+        var dirname = $(element).attr('data-dir');
+        var csrftoken = getCookie('csrftoken');
+        console.log(api_link, dirname);
+        var subdir = prompt("Enter Sub-Directory", "");
+        if (subdir == null || subdir == "") {
+          txt = "User cancelled the prompt.";
+        } else {
+          post_data = `create_subdir=yes&parent_dir=${dirname}&subdir_name=${subdir}`;
+          var client = new postRequest();
+            client.post(api_link, post_data, csrftoken, function(response) {
+            console.log(response);
+            window.location.reload();
+            })
+        } 
     }else if(link == 'archive-bookmark-multiple'){
         var [elpar, elar_join] = get_selected_items();
         post_data = `link_ids=${elar_join}`;
@@ -356,7 +377,7 @@ function dropdown_menu_clicked(element){
         var api_link = $(element).attr('api-url');
         var csrftoken = getCookie('csrftoken');
         var data_link = $(element).attr('data-link');
-        var directory = $('.breadcrumb-item').eq(1).find('a').eq(0).text().trim();
+        var directory = $(element).attr('data-dir');
         var server_url = window.location.protocol + '//' + window.location.hostname;
         if(window.location.port){
             server_url = server_url + ':' + window.location.port;
@@ -509,11 +530,11 @@ function clear_and_apply_badges(el, newtaglist, oldtaglist){
         badges.each(function(index){
             $(this).remove();
         })
-        var badge_html = create_badge_nodes(usr, newtaglist, 'nodiv');
+        var badge_html = create_badge_nodes(usr, newtaglist, 'nodiv', '');
         el.find('.badges').append(badge_html);
     }else{
         var td = el.find('td').eq(1);
-        var badge_html = create_badge_nodes(usr, newtaglist, 'div');
+        var badge_html = create_badge_nodes(usr, newtaglist, 'div', '');
         td.append(badge_html);
     }
 }
@@ -587,18 +608,19 @@ function generate_table_body(nlink, search, mode){
             var read_url = value['read-url'];
             var fav_path = value['fav-path'];
             var idd = value['id'];
+            var is_subdir = value['is-subdir'];
             
-            var badges = create_badge_nodes(usr, taglist, 'div');
+            var badges = create_badge_nodes(usr, taglist, 'div', root_loc);
             if (mode == 'dir'){
                 var dir_badge = "";
             }else{
-                var dir_badge = create_directory_badge(usr, directory);
+                var dir_badge = create_directory_badge(usr, directory, is_subdir, root_loc);
             }
             var table_content = create_table_rows(
                     usr, badges, index, title, netloc, loc,
                     timestamp, edit_b, ms, remove_link,
                     archive_media, directory, dir_badge,
-                    read_url, idd, fav_path, root_loc);
+                    read_url, idd, fav_path, root_loc, is_subdir);
             $("#tbody").append(table_content);
         }
     })
@@ -620,12 +642,13 @@ function move_to_bookmark(post_data, api_link, nlink, csrftoken, el, idlist, mer
         console.log(response);
         var json = JSON.parse(response);
         console.log(json.dir);
-        msg = getcheckbox_string(json.dir);
+        msg = getselectbox_string(json.dir);
         var resp = bootbox.confirm(msg, function(resp){
             console.log(resp);
             if (resp){
-                var info = $('.form-check-inline');
-                var val = info.find("input[name=optradio]:checked").attr('value');
+                var info = $('#select-dir-form');
+                var val = info.find("#select-dir-box option:selected").text();
+                console.log(val)
                 if(val){
                     console.log(val);
                     if(merge){
@@ -659,12 +682,12 @@ function move_to_bookmark(post_data, api_link, nlink, csrftoken, el, idlist, mer
     })
 }
 
-function create_badge_nodes(usr, taglist, mode){
+function create_badge_nodes(usr, taglist, mode, root_loc){
     var string = '';
     if (usr == null){
-        usr = '.';
+        usr = root_loc + '/' + '.';
     }else{
-        usr = '/' + usr
+        usr = root_loc + '/' + usr
     }
     for(i=0; i< taglist.length; i++){
         var tag = taglist[i].trim();
@@ -676,11 +699,19 @@ function create_badge_nodes(usr, taglist, mode){
     return string;
 }
 
-function create_directory_badge(usr, dirname){
-    string = `<span> | </span>
+function create_directory_badge(usr, dirname, is_subdir, root_loc){
+    if (dirname && dirname.includes('/')){
+        string = `<span> | </span>
             <small>
-            <a class="text-success" href="/${usr}/${dirname}">${dirname} </a>
+            <a class="text-success" href="${root_loc}/${usr}/subdir/${dirname}">${dirname} </a>
             </small>`
+    }
+    else{
+        string = `<span> | </span>
+            <small>
+            <a class="text-success" href="${root_loc}/${usr}/${dirname}">${dirname} </a>
+            </small>`
+    }
     return string
 }
 
@@ -727,7 +758,7 @@ function display_upload_file_name(event){
 function create_table_rows(usr, badge_nodes, index, title, netloc,
                            loc, timestamp, edit_b, ms, remove_link,
                            archive_media, dirname, dir_badge,
-                           read_url, idd, fav_path, root){
+                           read_url, idd, fav_path, root, is_subdir){
     console.log(root);
     var string = `<tr>
         <td><img width="24" src="${fav_path}"></td>
@@ -899,18 +930,17 @@ function getsettings_html(autotag, auto_summary, total_tags, buddy_list,
     return html;
 }
 
-function getcheckbox_string(list){
+function getselectbox_string(list){
     var str = '';
     for(i=0;i<list.length;i++){
         dirname = list[i];
-        str = str + `<span>  </span><div class="form-check-inline">
-                        <span>  </span><input id="radio-${i}" class="form-check-input" type="radio" name="optradio" value="${dirname}"> <span>  </span>
-                        <label class="form-check-label" for="radio-${i}">${dirname}</label>
-                    </div><span>  </span>`
+        str = str + `<option value=${dirname}>${dirname}</option>`
     }
-    return `</br><div class="card"><div class="card-header">Select Directory</div>
-                </div>
-            </br><form id="radio-dir-boxes" novalidate> ${str} </form>`;
+    return `</br><div class="card"><div class="card-header">Select Directory</div></div></br>
+            <form id="select-dir-form" novalidate>
+                <select id="select-dir-box" class="form-control">${str}</select>
+                <label class="form-select-label" for="select-dir-box"></label>
+            </form>`;
 }
 
 function getstr(title, url, tags, media_element){

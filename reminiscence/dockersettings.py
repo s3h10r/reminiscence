@@ -85,8 +85,17 @@ INSTALLED_APPS = [
     'pages',
     'accounts',
     'widget_tweaks',
-    'vinanti'
+    'vinanti',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'restapi'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication'
+    ],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -220,7 +229,7 @@ ALLOW_ANY_ONE_SIGNUP = False
 
 # Vinanti Multiprocess Settings for background tasks
 
-MULTIPROCESS_VINANTI = True
+MULTIPROCESS_VINANTI = False
 MULTIPROCESS_VINANTI_MAX_REQUESTS = 4
 
 # Vinanti async HTTP client settings
@@ -229,5 +238,11 @@ VINANTI_BACKEND = 'aiohttp'
 VINANTI_MAX_REQUESTS = 50
 
 DOWNLOAD_MANAGERS_ALLOWED = ['curl', 'wget']
+
+#Path to chromium executable or name of executable.
+#In some distro like ubuntu name of chromium executable is "chromium-browser".
+#So write it accordingly
+ 
+CHROMIUM_COMMAND = "chromium"
 
 CHROMIUM_SANDBOX = False

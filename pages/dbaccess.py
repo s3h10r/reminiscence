@@ -54,13 +54,23 @@ class DBAccess:
                        max_requests=settings.MULTIPROCESS_VINANTI_MAX_REQUESTS)
     
     @classmethod
-    def add_new_url(cls, usr, request, directory, row):
-        url_name = request.POST.get('add_url', '')
+    def add_new_url(cls, usr, request, directory, row,
+                    is_media_link=False, url_name=None,
+                    save_favicon=True):
+        if not url_name:
+            url_name = request.POST.get('add_url', '')
         if url_name:
-            if url_name.startswith('md:'):
-                url_name = url_name[3:].strip()
+            add_note = False
+            if url_name.startswith('md:') or is_media_link:
+                if url_name.startswith('md:'):
+                    url_name = url_name[3:].strip()
                 archive_html = True
                 media_element = True
+            elif url_name.startswith('note:'):
+                url_name = url_name[5:].strip()
+                archive_html = False
+                media_element = False
+                add_note = True
             else:
                 archive_html = False
                 media_element = False
@@ -68,19 +78,70 @@ class DBAccess:
                 settings_row = row[0]
             else:
                 settings_row = None
-            cls.process_add_url(usr, url_name,
-                                directory, archive_html, 
-                                settings_row=settings_row,
-                                media_element=media_element)
-                                
+            if add_note:
+                cls.process_add_note(usr, url_name,
+                                     directory, archive_html, 
+                                     settings_row=settings_row,
+                                     media_element=media_element,
+                                     add_note=add_note)
+            else:
+                cls.process_add_url(usr, url_name,
+                                    directory, archive_html, 
+                                    settings_row=settings_row,
+                                    media_element=media_element,
+                                    add_note=add_note, save_favicon=save_favicon)
+
+    @classmethod
+    def process_add_note(cls, usr, url_name, directory,
+                         archive_html, row=None,
+                         settings_row=None, media_path=None,
+                         media_element=False, add_note=False):
+        if row is None:
+            if settings_row and settings_row.reader_theme:
+                reader_theme = settings_row.reader_theme
+            else:
+                reader_theme = UserSettings.WHITE
+            row = Library.objects.create(usr=usr,
+                                         directory=directory,
+                                         url=None, title=url_name,
+                                         summary="Add Summary",
+                                         timestamp=timezone.now(),
+                                         media_element=media_element,
+                                         reader_mode=reader_theme,
+                                         subdir=False)
+            if '/' in directory:
+                url_ar = '{}/{}/subdir/{}/{}/archived-note'.format(settings.ROOT_URL_LOCATION,
+                                                                     usr.username, directory, row.id)
+            else:
+                url_ar = '{}/{}/{}/{}/archived-note'.format(settings.ROOT_URL_LOCATION,
+                                                            usr.username, directory, row.id)
+            row.url = url_ar
+            out_title = str(row.id) + ".note"
+            media_dir = os.path.join(settings.ARCHIVE_LOCATION, "NOTES")
+            if not os.path.exists(media_dir):
+                os.makedirs(media_dir)
+            media_path_parent = os.path.join(media_dir, str(row.id))
+            if not os.path.exists(media_path_parent):
+                os.makedirs(media_path_parent)
+            media_path = os.path.join(media_path_parent, out_title)
+            if not os.path.isfile(media_path):
+                with open(media_path, "w") as f:
+                    f.write("{}..Take notes".format(url_name))
+            row.media_path = media_path
+            row.save()
+        else:
+            logger.debug('row - exists')
+        return row.id
+    
     @classmethod
     def process_add_url(cls, usr, url_name, directory,
                         archive_html, row=None,
                         settings_row=None, media_path=None,
-                        media_element=False):
+                        media_element=False, add_note=False,
+                        save_favicon=True):
         part = partial(cls.url_fetch_completed, usr, url_name,
                        directory, archive_html, row, settings_row,
-                       media_path, media_element)
+                       media_path, media_element, save_favicon)
         if row:
             cls.vntbook.get(url_name, onfinished=part)
         else:
@@ -89,7 +150,8 @@ class DBAccess:
     @classmethod
     def url_fetch_completed(cls, usr, url_name, directory,
                             archive_html, row, settings_row,
-                            media_path, media_element, *args):
+                            media_path, media_element, save_favicon,
+                            *args):
         ext = None
         save = False
         save_text = False
@@ -163,7 +225,8 @@ class DBAccess:
                                          summary=summary,
                                          timestamp=timezone.now(),
                                          media_element=media_element,
-                                         reader_mode=reader_theme)
+                                         reader_mode=reader_theme,
+                                         subdir=False)
         else:
             logger.debug('row - exists')
         if not media_path:
@@ -185,10 +248,10 @@ class DBAccess:
             media_path = os.path.join(media_path_parent, out_title)
             row.media_path = media_path
             row.save()
-            if favicon_link and favicon_link.startswith('http'):
+            if favicon_link and favicon_link.startswith('http') and save_favicon:
                 cls.vnt.get(favicon_link, out=final_favicon_path)
-            logger.debug(final_og_link)
-            if final_og_link and final_og_link.startswith('http'):
+            logger.debug((final_og_link, final_favicon_path))
+            if final_og_link and final_og_link.startswith('http') and save_favicon:
                 cls.vnt.get(final_og_link, out=final_og_image_path)
         elif media_path and row:
             final_favicon_path = os.path.join(settings.FAVICONS_STATIC, str(row.id) + '.ico')
@@ -201,11 +264,14 @@ class DBAccess:
             else:
                 save_summary = True
             if (not os.path.exists(final_favicon_path)
-                    and favicon_link and favicon_link.startswith('http')):
+                    and favicon_link and favicon_link.startswith('http')
+                    and save_favicon):
                 cls.vnt.get(favicon_link, out=final_favicon_path)
             if (not os.path.exists(final_og_image_path)
-                    and final_og_link and final_og_link.startswith('http')):
+                    and final_og_link and final_og_link.startswith('http')
+                    and save_favicon):
                 cls.vnt.get(final_og_link, out=final_og_image_path)
+        logger.debug((save, save_text, 274))
         if save or save_text:
             if not os.path.exists(media_path_parent):
                 os.makedirs(media_path_parent)
@@ -327,10 +393,12 @@ class DBAccess:
     def convert_html_pdf_with_chromium(cls, media_path_parent,
                                        settings_row, row, url_name,
                                        media_path, mode='pdf'):
+        if not os.path.exists(media_path_parent):
+            os.makedirs(media_path_parent)
         if mode == 'pdf':
             pdf = os.path.join(media_path_parent, str(row.id)+'.pdf')
             cmd = [
-                'chromium', '--headless', '--disable-gpu',
+                settings.CHROMIUM_COMMAND, '--headless', '--disable-gpu',
                 '--print-to-pdf={}'.format(pdf), url_name]
             if not settings.CHROMIUM_SANDBOX:
                 cmd.insert(1, '--no-sandbox')
@@ -344,7 +412,7 @@ class DBAccess:
         elif mode == 'dom':
             htm = os.path.join(media_path_parent, str(row.id)+'.htm')
             cmd = [
-                'chromium', '--headless', '--disable-gpu',
+                settings.CHROMIUM_COMMAND, '--headless', '--disable-gpu',
                 '--dump-dom', url_name
                 ]
             if not settings.CHROMIUM_SANDBOX:
@@ -367,7 +435,7 @@ class DBAccess:
             fd.write(output)
         return True
     
-    @task(name="convert-to-pdf-png")
+    @task(name="convert-to-pdf-png-chromium")
     def getdom_chromium(cmd, htm):
         if os.name == 'posix':
             output = subprocess.check_output(cmd)
@@ -398,7 +466,7 @@ class DBAccess:
     def get_rows_by_directory(usr, directory=None, search=None, search_mode='title'):
         
         usr_list = []
-        
+        subdir_list = []
         if search and search_mode != 'dir':
             if search_mode == 'title':
                 usr_list = Library.objects.filter(usr=usr, title__icontains=search).order_by('-timestamp')
@@ -425,7 +493,16 @@ class DBAccess:
                      tags, row.directory, row.media_path,
                      row.media_element)
                 )
-        return nusr_list
+            elif row.subdir:
+                for subdir in row.subdir.split('/'):
+                    subdir_list.append(
+                        (subdir, row.url, row.id, row.timestamp,
+                         [], row.directory+'/'+subdir, row.media_path,
+                         row.media_element)
+                    )
+        if subdir_list:
+            subdir_list = subdir_list[::-1]
+        return subdir_list + nusr_list
 
     @staticmethod
     def get_rows_by_tag(usr, tagname):
@@ -456,7 +533,7 @@ class DBAccess:
             return None
 
     @staticmethod
-    def populate_usr_list(usr, usr_list, create_dict=False):
+    def populate_usr_list(usr, usr_list, create_dict=False, short_dict=False):
         if create_dict:
             nlist = {}
         else:
@@ -464,17 +541,29 @@ class DBAccess:
         index = 1
         username = usr.username
         for title, url, idd, timestamp, tag, directory, media_path, media_element in usr_list:
-            title = re.sub('_|-', ' ', title)
-            title = re.sub('/', ' / ', title)
-            base_dir = '{}/{}/{}/{}'.format(settings.ROOT_URL_LOCATION, usr, directory, idd)
+            is_subdir = False
+            if '/' in directory and not url:
+                base_dir = '{}/{}/subdir/{}'.format(settings.ROOT_URL_LOCATION, usr, directory)
+                is_subdir = True
+                url = base_dir
+            elif '/' in directory and url:
+                base_dir = '{}/{}/subdir/{}/{}'.format(settings.ROOT_URL_LOCATION, usr, directory, idd)
+            else:
+                base_dir = '{}/{}/{}/{}'.format(settings.ROOT_URL_LOCATION, usr, directory, idd)
+                title = re.sub('_|-', ' ', title)
+                title = re.sub('/', ' / ', title)
             base_remove = base_dir + '/remove'
+            base_rename = base_dir + '/rename'
             base_et = base_dir + '/edit-bookmark'
             move_single = base_dir + '/move-bookmark'
             move_multiple = base_dir + '/move-bookmark-multiple'
             base_eu = base_dir + '/edit-url'
             read_url = base_dir + '/read'
             if media_path and os.path.exists(media_path):
-                archive_media = base_dir + '/archive'
+                if url and url.endswith("archived-note"):
+                    archive_media = url
+                else:
+                    archive_media = base_dir + '/archive'
             else:
                 archive_media = url
             netloc = urlparse(url).netloc
@@ -482,11 +571,25 @@ class DBAccess:
                 netloc = netloc[:20]+ '..'
             timestamp = timestamp.strftime("%d %b %Y")
             final_favicon_path = os.path.join(settings.FAVICONS_STATIC, str(idd) + '.ico')
-            if os.path.exists(final_favicon_path):
+            if is_subdir:
+                fav_path = settings.STATIC_URL + 'folder.svg'
+            elif os.path.exists(final_favicon_path):
                 fav_path = settings.STATIC_URL + 'favicons/{}.ico'.format(idd)
             else:
                 fav_path = settings.STATIC_URL + 'archive.svg'
-            if create_dict:
+            if create_dict and short_dict:
+                nlist.update(
+                        {
+                            index:{
+                                'title':title, 'url':url,
+                                'timestamp': timestamp, 'tag':tag,
+                                'archive-media':archive_media,
+                                'read-url':read_url, 'id': idd, 'fav-path': fav_path,
+                                'media-element': media_element, 'is-subdir': is_subdir
+                            }
+                        }
+                    )
+            elif create_dict and not short_dict:
                 nlist.update(
                         {
                             index:{
@@ -497,7 +600,8 @@ class DBAccess:
                                 'move-multi': move_multiple, 'usr':username,
                                 'archive-media':archive_media, 'directory':directory,
                                 'read-url':read_url, 'id': idd, 'fav-path': fav_path,
-                                'media-element': media_element
+                                'media-element': media_element, 'is-subdir': is_subdir,
+                                'base-rename': base_rename
                             }
                         }
                     )
@@ -507,7 +611,7 @@ class DBAccess:
                         index, title, netloc, url, base_et, base_remove,
                         timestamp, tag, move_single, move_multiple,
                         archive_media, directory, read_url, idd, fav_path,
-                        media_element
+                        media_element, is_subdir, base_rename
                     ]
                 )
             index += 1
@@ -620,14 +724,46 @@ class DBAccess:
                     elif mode == 'tags' and tags_list:
                         cls.edit_tags(usr, row.id, ','.join(tags_list), '')
         if merge_dir and merge_dir != dirname and mode == 'merge':
-            qlist = Library.objects.filter(usr=usr, directory=dirname)
-            qlistm = Library.objects.filter(usr=usr, directory=merge_dir)
-            for row in qlist:
-                if not row.url:
-                    row.delete()
-            Library.objects.filter(usr=usr, directory=dirname).update(directory=merge_dir)
+            qlist = Library.objects.filter(usr=usr, directory=dirname, url__isnull=True).first()
+            if qlist and not qlist.subdir:
+                qlist.delete()
+                Library.objects.filter(usr=usr, directory=dirname).update(directory=merge_dir)
+            elif qlist and qlist.subdir:
+                sub_list = qlist.subdir
+                qlist.delete()
+                Library.objects.filter(usr=usr, directory=dirname).update(directory=merge_dir)
+                nqlist = Library.objects.filter(usr=usr, directory__istartswith=dirname+'/')
+                for row in nqlist:
+                    row.directory = re.sub(dirname, merge_dir, row.directory, 1)
+                    row.save()
+                nqlist = Library.objects.filter(usr=usr, directory=merge_dir, url__isnull=True).first()
+                if nqlist and nqlist.subdir:
+                    subdir = nqlist.subdir + '/'+ sub_list
+                    nqlist.subdir = '/'.join(sorted(list(set(subdir.split('/')))))
+                    nqlist.save()
+                elif nqlist and not nqlist.subdir:
+                    nqlist.subdir = sub_list
+                    nqlist.save()
+                
+            if '/' in dirname:
+                cls.remove_subdirectory_link(usr, dirname)
         return msg
-
+    
+    @staticmethod
+    def remove_subdirectory_link(usr, dirname, ren_dir=None):
+        pdir, cdir = dirname.rsplit('/', 1)
+        qlist = Library.objects.filter(usr=usr, directory=pdir, url__isnull=True).first()
+        if qlist and qlist.subdir:
+            subdir_list = qlist.subdir.split('/') 
+            if cdir in subdir_list:
+                if ren_dir is not None:
+                    subdir_list[subdir_list.index(cdir)] = ren_dir
+                else:
+                    del subdir_list[subdir_list.index(cdir)]
+                logger.debug(subdir_list)
+                qlist.subdir = '/'.join(subdir_list)
+                qlist.save()
+    
     @staticmethod
     def edit_bookmarks(usr, request, url_id):
         title = request.POST.get('new_title', '')

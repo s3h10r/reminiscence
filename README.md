@@ -24,6 +24,12 @@ Table of Contents
     * [Generating PDF and Full-Page Screenshot](#generating-pdf-and-png)
 
     * [Archiving Media Elements](#archiving-media-elements)
+
+    * [Annotation and Read-it-later feature](#annotation-and-read-it-later-feature)
+
+    * [REST API](#rest-api)
+
+    * [Running Tests](#running-tests)
     
     * [Public, Private and Group Directories](#public-private-group-directories)
     
@@ -35,11 +41,13 @@ Table of Contents
     
     * [Gunicorn plus Nginx setup](#gunicorn-plus-nginx-setup)
     
-    * [Handling Background Tasks](#handling-background-tasks-without-using-celery-or-other-external-task-queue-manager)
+    * [Handling Background Tasks](https://github.com/kanishka-linux/reminiscence/wiki/Background-Tasks)
 
-    * [Improving Performance](#improving-performance)
+    * [Improving Performance](https://github.com/kanishka-linux/reminiscence/wiki/Improving-Performance)
 
-* [Future Roadmap](#future-roadmap)
+    * [Browser Addons](https://github.com/kanishka-linux/reminiscence/wiki/Browser-Addons)
+
+* [Future Roadmap](https://github.com/kanishka-linux/reminiscence/wiki/Future-Roadmap)
 
 * [Motivation](#motivation)
 
@@ -69,13 +77,21 @@ Table of Contents
 
 * Supports public and group directory for every user.
 
-* Upload any file from web-interface for archieving.
+* Upload any file from web-interface for archiving.
 
 * Easy to use admin interface for managing multiple users.
 
 * Import bookmarks from Netscape Bookmark HTML file format.
 
 * Supports streaming of archived media elements.
+
+* Annotation support for both HTML, its readable version.
+
+* Annotation support for both archived and uploaded pdf/epub files.
+
+* Remembers last read position of html (and its readable version), pdf and epub.
+
+* Rudimentary support for adding custom note.
 
 
 # Installation
@@ -187,7 +203,7 @@ Using docker is convenient compared to normal installation method described abov
 
         192.168.1.2/admin/
 
-        Note: In this metod, there is no need to
+        Note: In this method, there is no need to
               attach port number to IP address.
 
 7. Change default admin password from admin interface and create new regular user. After that logout, and open '**192.168.1.2**'. Now login with regular user for regular activity.
@@ -197,6 +213,8 @@ Using docker is convenient compared to normal installation method described abov
 **Note:** If Windows users are facing problem in mounting data volume for Postgres, they are advised to refer this [issue](https://github.com/kanishka-linux/reminiscence/issues/1).
 
 **Note:** Ubuntu 16.04 users might have to modify docker-compose.yml file and need to change version 3 to 2. [issue](https://github.com/kanishka-linux/reminiscence/issues/4)
+
+**Note:** For setting celery inside docker follow [these instruction](https://github.com/kanishka-linux/reminiscence/wiki/Celery-Plus-Docker). Sometimes gunicorn doesn't work properly with default background task handler inside docker. In such cases users can enable celery.
 
 # Documentation
 
@@ -251,7 +269,7 @@ In future, I'll try to provide a way to choose between different backends (i.e. 
 
 **Note:** This feature is available from v0.2+ onwards
 
-1. In settings.py file add your favourite download manager to DOWNLOAD_MANAGERS_ALLOWED list. Default are curl and wget. In case of docker based method users have to make corresponding changes in dockersettings.py file.
+1. In settings.py file add your favourite download manager to DOWNLOAD_MANAGERS_ALLOWED list. Default are curl and wget. In case of docker based method users have to make corresponding changes in dockersettings.py file. For large arbitrary files with direct download links, curl and wget are good enough. For complex use cases users will need something like youtube-dl, which they have to install and manage on their own and needs to be added to the DOWNLOAD_MANAGERS_ALLOWED list.  
 
 2. open web-interface settings box and add command to Download Manager Field:
     
@@ -259,6 +277,10 @@ In future, I'll try to provide a way to choose between different backends (i.e. 
     
         iurl -> input url
         output -> output path
+
+        OR
+
+        ex: youtube-dl {iurl} -o {output}
     
 3. Users should not substitute anything for {iurl} and {output} field, they should be kept as it is. In short, users should just write regular command with parameters and leave the {iurl} and {output} field untouched. (Note: do not even remove curly brackets).
     
@@ -278,13 +300,98 @@ In future, I'll try to provide a way to choose between different backends (i.e. 
 
         ex=> md:https://some-website-with-media-link.org/media-link
 
-        Every entry added by this way will be treated as containing media.
+        Every entry added by this way will be treated as containing media
+
+        or single arbitrary file with direct download link.
 
 9. Archived files are normally saved in **archive** folder. Users can change location of this folder via settings.py file. Users should note that in order to archive media files, the **archive** location should not contain any space.
 e.g. archive location '/home/user/my downloads/archive' is not allowed. However location without space '/home/user/my_downloads/archive' is allowed.
 
-10. By default, archived media links are not shared with anyone. However, users can create public links for some fixed time. Once a public link has been created, it will remain valid for 24 hours. Users can change this value by changing value of VIDEO_ID_EXPIRY_LIMIT in settings.py. These public links are also useful for playing non-HTML5 compliant archived media on regular media players like mpv/mplayer/vlc etc..It is also possible to generate a playlist in m3u format for a directory containing media links, which can be played by any popular media player. 
+10. By default, archived media links are not shared with anyone. However, users can create public links for some fixed time. Once a public link has been created, it will remain valid for 24 hours. Users can change this value by changing value of VIDEO_ID_EXPIRY_LIMIT in settings.py. These public links are also useful for playing non-HTML5 compliant archived media on regular media players like mpv/mplayer/vlc etc..It is also possible to generate a playlist in m3u format for a directory containing media links, which can be played by any popular media player.
 
+## Annotation And Read-it-later Feature
+
+This is the latest feature and available from v0.3+ onwards. This feature allows addition, deletion and modification of annotation.
+
+* Users can annotate archived HTML page, its readable version and also pdf version.
+
+* Users can also annotate archived or uploaded pdf/epub files.
+
+* The application will remember last read position of html, pdf and epub.
+
+Annotation support works well on desktop browsers. On mobile, this feature works mostly on firefox (for annotating html/pdf/epub).
+
+#### How to use this feature on desktop browsers?
+
+* Higlight text -> an annotation balloon will popup -> click on it -> add/save comment.
+
+* Click on the `back` button, at the bottom right corner to save last read position and go back to previous page.
+
+#### How to use this feature on mobile firefox?
+
+* `Double tap` on starting word from where you want to highlight -> Selection markers will appear (and annotation balloon too but don't tap on it) -> Drag the end of selection marker to the desired end point -> now `single tap` at the last word -> an annotation balloon will popup -> tap on the balloon -> add/save comment.
+
+* Click on the `back` button, at the bottom right corner to save last read position and go back to previous page.
+
+How these featues have been implemented?
+
+* for annotation [annotator.js](http://annotatorjs.org/) has been used at the client side.
+
+* PDFs are displayed using [pdf.js](https://github.com/mozilla/pdf.js/) within browser, on which annotation layer is applied using `annotator.js`.
+
+* EPUBs are displayed using [epub.js](https://github.com/futurepress/epub.js/) within browser, on which annotation layer is applied using `annotator.js`
+
+* annotation data for each file and the last read position is saved at the backend.
+
+## REST API
+
+Reminiscence uses Django Rest Framework for exposing few functionalities via REST endpoints (available from v0.3+ onwards).
+
+Following are few examples of API usage using cURL
+
+1. Login and get auth token (POST) `/restapi/login/`
+
+        $ curl -d username=mypy -d password=foobarbaz http://127.0.0.1:8000/restapi/login/
+
+Token obtained with above request needs to be passed to every subsequent request header. We'll call the token as **AUTHTOKEN** for rest of the examples.
+
+2. Add url to Reminiscence instance in a specific directory (POST) `/restapi/add-url/`
+
+        $ curl -H "Authorization: Token AUTHTOKEN" -d url="https://mr.wikipedia.org" -d media_link=no -d directory="/Wiki/Marathi" http://127.0.0.1:8000/restapi/add-url/
+
+3. List all urls added to a specific directory (POST) `/restapi/list-added-urls/`
+
+        $ curl -H "Authorization: Token AUTHTOKEN" -d directory="/Wiki" http://127.0.0.1:8000/restapi/list-added-urls/
+
+4. List all directories (GET) `/restapi/list-directories/`
+
+        $ curl -H "Authorization: Token AUTHTOKEN" http://127.0.0.1:8000/restapi/list-directories/
+
+5. Logout and remove token (GET) `/restapi/logout/`
+
+        $ curl -H "Authorization: Token AUTHTOKEN" http://127.0.0.1:8000/restapi/logout/
+
+## Running Tests
+
+* When running all tests exlude async tests. Async tests need to run separately.
+
+        $ python manage.py test --exclude-tag=async
+
+* Only **tests_drf.py** file contains async test, so run it separately.
+
+        $ python manage.py test tests.tests_drf
+        
+## Note Taking
+
+From v0.3 onwards, users can add arbitrary note to their collection. Support for note taking is rudimentary and provides note taking using simple WYSIWYG editor.
+
+For adding note use following command in the input url box:
+
+        note:New note
+
+        above command will create *New note* in the current folder
+
+        
 ## Public-Private-Group directories
 
 By default, all directories and all links are private and are not shared with anyone. However, users can select one public directory and one group directory from all available directories for sharing links. User can set public and group directory via settings. Links placed in public directory will be available for public viewing and links placed in group directory will be available for pre-determined list of users selected by account holder.
@@ -332,7 +439,7 @@ reminiscence folder contains three settings files
 
 * Instead of using **python manage.py runserver** command as mentioned in above installation instructions use following command. Users can change parameters according to need. Only make sure to keep value of **timeout** argument somewhat bigger. Larger timeout value is useful, if upload speed is slow and user want to upload relatively large body from web-interface.
 
-        $ gunicorn --max-requests 1000 --worker-class gthread --workers 2 --thread 5 --timeout 300 --bind 0.0.0.0:8000 reminiscence.wsgi
+        $ gunicorn --max-requests 100 --worker-class gthread --workers 2 --thread 5 --timeout 300 --bind 0.0.0.0:8000 reminiscence.wsgi
 
 * Install **nginx** using native package manager of distro and then make adjustments to nginx config files as given below. Following is sample configuration. Adjust it according to need, but pay special attention to **proxy_read_timeout** and **client_max_body_size** variables. Incorrect value of these two variables can make upload from web-interface impractical.
 
@@ -380,55 +487,15 @@ reminiscence folder contains three settings files
 
 * Once nginx config file is properly configured, start/enable nginx.service. For detailed instructions take a look at this [tutorial](https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu-16-04) or refer this [wiki](https://wiki.archlinux.org/index.php/Nginx). There are some barebone instructions available [here](http://gunicorn.org/index.html#deployment), which users might find useful.
 
-## Handling background tasks without using celery or other external task queue manager
+* When using gunicorn as web server and nginx as reverse proxy, it is necessary to add static files of admin interface to the **static** folder. Otherwise, admin interface won't render properly. Users can do it manually. Or alternatively, they can modify setting.py file and add 
+    
+        STATIC_ROOT = os.path.join(BASE_DIR, "static")
+    
+to it. After that collect staticfiles using command
 
-* This application has to perform number of background tasks, like Fetching web-page, favicons and converting pages to pdf/png.  In order to do these tasks application uses [Vinanti](https://github.com/kanishka-linux/vinanti) library. I wrote this library as a simple easy to use async HTTP client which one can integrate with synchronous codebase of python. However, it can be used easily for executing some arbitrary function in the background (using either threads or processes) without having to worry about managing threads/processes manually. It was just an experiment, but it worked very well in this self-hosted application. 
-
-* When importing list of bookmarks numbering 1500+, it has to make 1500 requests to bookmarked links in order to get web-page contents (for generating automatic tags/summary) and 1500+ more requests for fetching favicons. With aiohttp as backend for Vinanti, the application used only two threads for managing these 3000+ http requests aynchronously and at the same time allowed development server to remain responsive (without using gunicorn) for any incoming request. For executing pdf/png conversion tasks in the background, the task queue of Vinanti seemed sufficient for handling requests from few users at a time. 
-
-* Making 3000 http requests in the background, archiving their output as per content-type, along with generating tags/summary using NLTK and database (postgresql) write (without converting pages to png/pdf), took somewhere along 12-13 minutes with aiohttp as backend and 50 async http requests at a time. By default, Vinanti does not use aiohttp in this project. In order to use aiohttp, user should set **VINANTI_BACKEND='aiohttp'** in settings.py file. Converting pages to png/pdf will be time consuming and might take hours depending on server and number of bookmarked links.
-
-* Even though, this appraoch is working well for self-hosted application with limited number of users with limited tasks. For large number of tasks, it it better to use dedicated external task queue manager. That's why option has been provided to set up celery, if a user and his group has large number of bookmarked links which they want to convert to pdf/png format. Maybe in future, option may be provided for making http requests and postprocessing content to celery, if current setup with Vinanti won't deliver upto expectations.
-
-
-## Improving Performance
-
-* Prefer python version 3.6.5+
-
-* Replace default sqlite database with postgresql
-
-* Use headless version of wkhtmltopdf
-
-* Use celery for pdf/png conversion
-
-* Use aiohttp backend for Vinanti for fetching web-pages asynchronously
-
-* When using gunicorn, adjust workers depending on number of cpu cores of the server.
-
-    According to gunicorn docs, preferred number of workers = 2n+1, where n = number of cores
-
-* Minimum 2GB RAM
-
-
-# Future Roadmap
-
-- [x] Allow people to write custom scripts or use third party tools for their unique archival needs. 
-
-- [x] Provide an option to change headless browsers for PDF/PNG generation.
-
-- [ ] Provide token-based authentication which will help in developing browser addons or mobile applications
-
-- [ ] Monitor/archive selected links periodically
-
-- [ ] Support multi-word tagging
-
-- [ ] Support for text annotation
-
-- [ ] Provide browser addons
-
-- [ ] Document API 
-
-- [ ] Add support for WARC format
+        $ python manage.py collectstatic
+        
+Once staticfiles of admin have been collected in the **static** folder, users should remove **STATIC_ROOT** from settings.py, before running the web server.
 
 # Motivation
 
