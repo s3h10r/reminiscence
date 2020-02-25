@@ -1,3 +1,5 @@
+a fork which **works on armv7l-architecture** (raspberrypi)
+
 # Reminiscence
 
 Self-hosted Bookmark and Archive manager
