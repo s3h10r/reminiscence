@@ -3,6 +3,7 @@
 *.pyc
 __pycache__/
 archive/
+backup/
 static/favicons/
 static/nltk_data/
 db/

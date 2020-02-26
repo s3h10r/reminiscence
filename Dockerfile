@@ -1,1 +1,1 @@
-Dockerfile.armv7l
+Dockerfile.armv7l.vostok
