@@ -10,16 +10,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
-RUN apt-get update && apt-get install -y \
-        build-essential \
-        libpq-dev \
-        libxml2 \
-        libxml2-dev \
-        libxslt1-dev \
-        python-dev \
-        libpython3-all-dev \
-        zlib1g-dev
-
+COPY requirements.apt.armv7l .
+RUN apt-get update && sed 's/#.*//' requirements.apt.armv7l | xargs apt-get install -y
 RUN pip install -r requirements.txt
 
 COPY . /usr/src/reminiscence

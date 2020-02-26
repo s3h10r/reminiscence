@@ -1,0 +1,11 @@
+# --- dependencies for building pip-packages (lxml ...) from source
+build-essential                                                              
+libpq-dev 
+libxml2 
+libxml2-dev 
+libxslt1-dev 
+python-dev 
+libpython3-all-dev 
+zlib1g-dev
+
+ffmpeg # for youtube-dl
