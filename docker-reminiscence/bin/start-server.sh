@@ -5,6 +5,8 @@
 $(dirname $0)/_update_pips.sh
 # ---
 
+wdb.server.py & # start web debugger (don't do this in production)
+
 while ! nc -w 1 -z db 5432; 
     do sleep 0.1; 
 done; 

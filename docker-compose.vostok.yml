@@ -16,6 +16,7 @@ services:
     build: .
     ports:
       - "8000:8000"
+      - "1984:1984"
     volumes:
       - ./static:/usr/src/reminiscence/static/
       - ./archive:/usr/src/reminiscence/archive/

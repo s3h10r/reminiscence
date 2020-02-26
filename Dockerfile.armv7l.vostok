@@ -25,5 +25,5 @@ RUN mkdir -p logs archive tmp \
   && python manage.py generatesecretkey
 
 STOPSIGNAL SIGTERM
-CMD ["/usr/src/reminiscence/docker-reminiscence/bin/start-server.sh"]
+CMD ["./docker-reminiscence/bin/start-server.sh"]
   

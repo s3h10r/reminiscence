@@ -7,5 +7,3 @@ libxslt1-dev
 python-dev 
 libpython3-all-dev 
 zlib1g-dev
-
-ffmpeg # for youtube-dl

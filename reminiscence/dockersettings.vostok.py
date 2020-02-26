@@ -27,6 +27,7 @@ SECRET_KEY = '<Enter Secret Key Here>'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = True
+#DEBUG_PROPAGATE_EXCEPTIONS = True # needed by webdebugger (wdb) if used
 
 ALLOWED_HOSTS = ['*']
 
