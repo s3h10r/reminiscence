@@ -32,7 +32,51 @@
 </form>
 </br>
 
-{% include 'includes/latest_entries.html' %}
+<div class="row">
+  <div class="col-sm">
+    {% include 'includes/latest_entries.html' %}
+  </div>
+  <div class="col-sm">
+        <!-- TODO: improve responsiveness of UI
+             (ajax/django-channels to show status
+             of current running tasks
+             (archiving entry, ,edia download, ...) -->
+    <div align="center"> 
+      <a href="#" data-toggle="collapse" data-target="#id-task_list" aria-expanded="true" aria-controls="id-task_list">
+        tasks running
+      </a>
+    </div>
+    <div class="collapse show" id="id-task_list">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">id</th>
+          <th scope="col">title</th>
+          <th scope="col">status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td> TODO </td>
+          <td> TODO </td>
+          <td> {running, waiting, finished, error} </td>
+        </tr>
+        <tr>
+          <td> TODO </td>
+          <td> TODO </td>
+          <td> TODO </td>
+        </tr>
+        <tr>
+          <td> TODO </td>
+          <td> TODO </td>
+          <td> TODO </td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+
+  </div>
+</div>
 
 <div align="center">
     <h2> Library </h2>
