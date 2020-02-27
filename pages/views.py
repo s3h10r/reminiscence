@@ -8,7 +8,7 @@ it under the terms of the GNU Affero General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-Reminiscence is distributed in the hope that it will be useful, 
+Reminiscence is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
@@ -41,6 +41,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+import wdb
 
 from vinanti import Vinanti
 from bs4 import BeautifulSoup
@@ -54,6 +55,20 @@ from .utils import ImportBookmarks
 from django.db.models import Q
 
 logger = logging.getLogger(__name__)
+
+def _get_latest_entries(n=10,user=None):
+    """
+    return n latest Library entries for usr (or overall if user = None)
+    """
+    #wdb.set_trace()
+    usr = user
+    if not isinstance(n,int):
+        n=10
+    if usr:
+        latests = Library.objects.filter(usr=usr).order_by('-timestamp')[:n]
+    else:
+        latests = Library.objects.order_by('-timestamp')[:n]
+    return latests
 
 
 @login_required
@@ -77,11 +92,13 @@ def dashboard(request, username=None, directory=None):
         base_rename = base_dir + '/rename'
         nlist.append([index, key, value-1, base_dir, base_rename, base_remove])
         index += 1
+    latest_entries_list = _get_latest_entries(n=5,user=usr)
     response = render(
                     request, 'home.html',
                     {
                         'usr_list': nlist, 'form':form,
-                        'root':settings.ROOT_URL_LOCATION
+                        'root':settings.ROOT_URL_LOCATION,
+                        'latest_entries_list':latest_entries_list,
                     }
                 )
     return response
@@ -118,7 +135,7 @@ def rename_operation(request, username, directory):
                     )
     else:
         return redirect('logout')
-        
+
 
 @login_required
 def remove_operation(request, username, directory):
@@ -342,10 +359,10 @@ def record_epub_loc(request, epub_loc):
     with open(epub_loc, 'w') as f:
         f.write(cfi)
     return redirect(path_info)
-    
+
 @login_required
 def navigate_directory(request, username, directory=None, tagname=None, epub_loc=None):
-    
+
     usr = request.user
     base_dir = '{}/{}/{}'.format(settings.ROOT_URL_LOCATION, usr, directory)
     usr_list = []
@@ -355,7 +372,7 @@ def navigate_directory(request, username, directory=None, tagname=None, epub_loc
     if directory or tagname:
         if epub_loc:
             return record_epub_loc(request, epub_loc)
-            
+
         place_holder = 'Enter URL'
         if request.method == 'POST' and directory:
             form = AddURL(request.POST)
@@ -377,7 +394,7 @@ def navigate_directory(request, username, directory=None, tagname=None, epub_loc
             if usr_list is None:
                 return redirect('home')
         nlist = dbxs.populate_usr_list(usr, usr_list)
-        
+
         page = request.GET.get('page', 1)
         row = UserSettings.objects.filter(usrid=usr)
         if row and row[0].pagination_value:
@@ -597,7 +614,7 @@ def modify_annotations(request, annot_id):
             with open(annot_file, "w") as fl:
                 fl.write(json.dumps(js, ensure_ascii=False))
             return HttpResponse(status=204)
-            
+
 
 def get_annot_index(annot_id, rows):
     del_index = str(annot_id)
@@ -948,6 +965,6 @@ def api_points(request, username):
                                              settings_row=set_row)
                         dict_val.update({'status':'ok'})
                     return HttpResponse(json.dumps(dict_val))
-                        
+
     return HttpResponse(json.dumps(default_dict))
-    
+

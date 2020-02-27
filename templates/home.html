@@ -31,7 +31,38 @@
     {% endfor %}
 </form>
 </br>
-<div class="card">
+
+<div align="center">
+  <a href="#" data-toggle="collapse" data-target="#id-latest_entries_list" aria-expanded="true" aria-controls="id-latest_entries_list">
+     latest {{latest_entries_list|length}} entries
+  </a>
+</div>
+<div class="collapse show" id="id-latest_entries_list">
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">title</th>
+      <th scope="col">directory</th>
+      <th scope="col">time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in latest_entries_list %}
+    <tr>
+      <td> <a href="{{e.url}}">{{e.title|truncatechars:"78"}}</a> </td>
+      <td> {{e.directory}} </td>
+      <td> {{e.timestamp|date:"Y-m-d"}} </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+</div>
+
+<div align="center">
+    <h2> Library </h2>
+</div>
+
+<div class="card" id="id-library_toplevel">
 <table class="table table-hover" >
 <thead class="thead-dark" id="thead-dark">
   <tr>
