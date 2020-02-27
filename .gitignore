@@ -2,6 +2,7 @@
 *.sqlite3
 *.swp
 *.pyc
+Session.vim
 __pycache__/
 archive/
 backup/
@@ -10,3 +11,4 @@ static/nltk_data/
 db/
 logs/
 tmp/
+venv/

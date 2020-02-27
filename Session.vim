@@ -52,16 +52,17 @@ set stal=2
 tabnew
 tabnew
 tabnew
+tabnew
 tabrewind
 edit ./pages/views.py
 set splitbelow splitright
 wincmd _ | wincmd |
+split
+1wincmd k
+wincmd _ | wincmd |
 vsplit
 1wincmd h
 wincmd w
-wincmd _ | wincmd |
-split
-1wincmd k
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -70,11 +71,11 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 85 + 86) / 172)
-exe '2resize ' . ((&lines * 30 + 22) / 45)
-exe 'vert 2resize ' . ((&columns * 86 + 86) / 172)
-exe '3resize ' . ((&lines * 11 + 22) / 45)
-exe 'vert 3resize ' . ((&columns * 86 + 86) / 172)
+exe '1resize ' . ((&lines * 32 + 23) / 47)
+exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
+exe '2resize ' . ((&lines * 32 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
+exe '3resize ' . ((&lines * 11 + 23) / 47)
 argglobal
 if bufexists("./pages/views.py") | buffer ./pages/views.py | else | edit ./pages/views.py | endif
 onoremap <buffer> C :call pymode#motion#select_c('^\s*class\s', 0)
@@ -232,47 +233,65 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal nowrap
 setlocal wrapmargin=0
-76
+60
 normal! zo
-78
+79
 normal! zo
-448
+81
 normal! zo
-453
+83
 normal! zo
-448
+85
+normal! zo
+93
+normal! zo
+100
+normal! zo
+100
+normal! zo
+100
+normal! zo
+100
+normal! zo
+102
+normal! zo
+108
+normal! zo
+108
+normal! zo
+451
+normal! zo
+472
+normal! zo
+451
 normal! zc
-473
+476
 normal! zo
-631
+483
 normal! zo
-636
+483
+normal! zc
+476
+normal! zc
+505
 normal! zo
-651
+506
 normal! zo
-689
+508
 normal! zo
-695
+509
 normal! zo
-697
+634
 normal! zo
-712
+637
 normal! zo
-721
+974
 normal! zo
-755
-normal! zo
-788
-normal! zo
-835
-normal! zo
-925
-normal! zo
-let s:l = 77 - ((30 * winheight(0) + 21) / 42)
+let s:l = 60 - ((11 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-77
+60
 normal! 0
 wincmd w
 argglobal
@@ -401,12 +420,12 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 37 - ((17 * winheight(0) + 15) / 30)
+let s:l = 47 - ((17 * winheight(0) + 16) / 32)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-37
-normal! 015|
+47
+normal! 011|
 wincmd w
 argglobal
 if bufexists("./pages/models.py") | buffer ./pages/models.py | else | edit ./pages/models.py | endif
@@ -596,13 +615,13 @@ normal! zt
 21
 normal! 0
 wincmd w
-exe 'vert 1resize ' . ((&columns * 85 + 86) / 172)
-exe '2resize ' . ((&lines * 30 + 22) / 45)
-exe 'vert 2resize ' . ((&columns * 86 + 86) / 172)
-exe '3resize ' . ((&lines * 11 + 22) / 45)
-exe 'vert 3resize ' . ((&columns * 86 + 86) / 172)
+exe '1resize ' . ((&lines * 32 + 23) / 47)
+exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
+exe '2resize ' . ((&lines * 32 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
+exe '3resize ' . ((&lines * 11 + 23) / 47)
 tabnext
-edit templates/home.html
+edit ./templates/includes/latest_entries.html
 set splitbelow splitright
 wincmd _ | wincmd |
 split
@@ -615,10 +634,10 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 20 + 22) / 45)
-exe '2resize ' . ((&lines * 21 + 22) / 45)
+exe '1resize ' . ((&lines * 22 + 23) / 47)
+exe '2resize ' . ((&lines * 21 + 23) / 47)
 argglobal
-if bufexists("templates/home.html") | buffer templates/home.html | else | edit templates/home.html | endif
+if bufexists("./templates/includes/latest_entries.html") | buffer ./templates/includes/latest_entries.html | else | edit ./templates/includes/latest_entries.html | endif
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -653,16 +672,16 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=
 setlocal expandtab
-if &filetype != 'htmldjango'
-setlocal filetype=htmldjango
+if &filetype != 'html'
+setlocal filetype=html
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
-setlocal nofoldenable
+setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
 set foldlevel=2
-setlocal foldlevel=2
+setlocal foldlevel=0
 setlocal foldmarker={{{,}}}
 set foldmethod=indent
 setlocal foldmethod=indent
@@ -723,8 +742,8 @@ setlocal statusline=
 setlocal suffixesadd=
 setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'htmldjango'
-setlocal syntax=htmldjango
+if &syntax != 'html'
+setlocal syntax=html
 endif
 setlocal tabstop=4
 setlocal tagcase=
@@ -743,15 +762,15 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 53 - ((13 * winheight(0) + 10) / 20)
+let s:l = 23 - ((22 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-53
-normal! 0
+23
+normal! 010|
 wincmd w
 argglobal
-if bufexists("templates/base.html") | buffer templates/base.html | else | edit templates/base.html | endif
+if bufexists("templates/home.html") | buffer templates/home.html | else | edit templates/home.html | endif
 setlocal keymap=
 setlocal noarabic
 setlocal autoindent
@@ -795,7 +814,7 @@ setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
 set foldlevel=2
-setlocal foldlevel=2
+setlocal foldlevel=0
 setlocal foldmarker={{{,}}}
 set foldmethod=indent
 setlocal foldmethod=indent
@@ -876,15 +895,25 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 10) / 21)
+40
+normal! zo
+52
+normal! zo
+57
+normal! zo
+63
+normal! zo
+70
+normal! zo
+let s:l = 43 - ((10 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
-normal! 0
+43
+normal! 06|
 wincmd w
-exe '1resize ' . ((&lines * 20 + 22) / 45)
-exe '2resize ' . ((&lines * 21 + 22) / 45)
+exe '1resize ' . ((&lines * 22 + 23) / 47)
+exe '2resize ' . ((&lines * 21 + 23) / 47)
 tabnext
 edit Dockerfile.armv7l.vostok
 set splitbelow splitright
@@ -899,8 +928,8 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe '1resize ' . ((&lines * 21 + 22) / 45)
-exe '2resize ' . ((&lines * 20 + 22) / 45)
+exe '1resize ' . ((&lines * 22 + 23) / 47)
+exe '2resize ' . ((&lines * 21 + 23) / 47)
 argglobal
 if bufexists("Dockerfile.armv7l.vostok") | buffer Dockerfile.armv7l.vostok | else | edit Dockerfile.armv7l.vostok | endif
 setlocal keymap=
@@ -1027,11 +1056,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 2 - ((1 * winheight(0) + 10) / 21)
+let s:l = 1 - ((0 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-2
+1
 normal! 0
 wincmd w
 argglobal
@@ -1160,21 +1189,25 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 10) / 20)
+let s:l = 1 - ((0 * winheight(0) + 10) / 21)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
 1
 normal! 0
 wincmd w
-exe '1resize ' . ((&lines * 21 + 22) / 45)
-exe '2resize ' . ((&lines * 20 + 22) / 45)
+exe '1resize ' . ((&lines * 22 + 23) / 47)
+exe '2resize ' . ((&lines * 21 + 23) / 47)
 tabnext
 edit ~/.bash_aliases
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
 1wincmd h
+wincmd w
+wincmd _ | wincmd |
+split
+1wincmd k
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -1183,8 +1216,11 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 86 + 86) / 172)
-exe 'vert 2resize ' . ((&columns * 85 + 86) / 172)
+exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
+exe '2resize ' . ((&lines * 22 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
+exe '3resize ' . ((&lines * 21 + 23) / 47)
+exe 'vert 3resize ' . ((&columns * 86 + 86) / 173)
 argglobal
 if bufexists("~/.bash_aliases") | buffer ~/.bash_aliases | else | edit ~/.bash_aliases | endif
 setlocal keymap=
@@ -1311,11 +1347,11 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 1 - ((0 * winheight(0) + 21) / 42)
+let s:l = 2 - ((1 * winheight(0) + 22) / 44)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-1
+2
 normal! 020|
 wincmd w
 argglobal
@@ -1444,15 +1480,293 @@ setlocal nowinfixheight
 setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
-let s:l = 4 - ((3 * winheight(0) + 21) / 42)
+let s:l = 5 - ((3 * winheight(0) + 11) / 22)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-4
+5
 normal! 020|
 wincmd w
-exe 'vert 1resize ' . ((&columns * 86 + 86) / 172)
-exe 'vert 2resize ' . ((&columns * 85 + 86) / 172)
+argglobal
+if bufexists("~/.bash_aliases") | buffer ~/.bash_aliases | else | edit ~/.bash_aliases | endif
+setlocal keymap=
+setlocal noarabic
+setlocal autoindent
+setlocal backupcopy=
+setlocal balloonexpr=
+setlocal nobinary
+setlocal nobreakindent
+setlocal breakindentopt=
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal colorcolumn=
+setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
+setlocal commentstring=#%s
+setlocal complete=.,w,b,u,t,i
+setlocal concealcursor=
+setlocal conceallevel=0
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+set cursorline
+setlocal cursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal expandtab
+if &filetype != 'sh'
+setlocal filetype=sh
+endif
+setlocal fixendofline
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+set foldlevel=2
+setlocal foldlevel=2
+setlocal foldmarker={{{,}}}
+set foldmethod=indent
+setlocal foldmethod=indent
+setlocal foldminlines=1
+set foldnestmax=10
+setlocal foldnestmax=10
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=tcq
+setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
+setlocal formatprg=
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=-1
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=GetShIndent()
+setlocal indentkeys=0{,0},0),0],!^F,o,O,e,0=then,0=do,0=else,0=elif,0=fi,0=esac,0=done,0=end,),0=;;,0=;&,0=fin,0=fil,0=fip,0=fir,0=fix
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255
+setlocal keywordprg=
+set linebreak
+setlocal linebreak
+setlocal nolisp
+setlocal lispwords=
+setlocal nolist
+setlocal makeencoding=
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:]
+setlocal nomodeline
+setlocal modifiable
+setlocal nrformats=bin,octal,hex
+set number
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal norelativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal scrolloff=-1
+setlocal shiftwidth=4
+setlocal noshortname
+setlocal sidescrolloff=-1
+setlocal signcolumn=auto
+setlocal nosmartindent
+setlocal softtabstop=0
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal statusline=
+setlocal suffixesadd=
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'sh'
+setlocal syntax=sh
+endif
+setlocal tabstop=4
+setlocal tagcase=
+setlocal tags=
+setlocal termmode=
+setlocal termwinkey=
+setlocal termwinscroll=10000
+setlocal termwinsize=
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal noundofile
+setlocal undolevels=-123456
+setlocal varsofttabstop=
+setlocal vartabstop=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+let s:l = 5 - ((2 * winheight(0) + 10) / 21)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+5
+normal! 016|
+wincmd w
+exe 'vert 1resize ' . ((&columns * 86 + 86) / 173)
+exe '2resize ' . ((&lines * 22 + 23) / 47)
+exe 'vert 2resize ' . ((&columns * 86 + 86) / 173)
+exe '3resize ' . ((&lines * 21 + 23) / 47)
+exe 'vert 3resize ' . ((&columns * 86 + 86) / 173)
+tabnext
+edit ~/perfect_workspace_notes.md
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+argglobal
+if bufexists("~/perfect_workspace_notes.md") | buffer ~/perfect_workspace_notes.md | else | edit ~/perfect_workspace_notes.md | endif
+setlocal keymap=
+setlocal noarabic
+setlocal autoindent
+setlocal backupcopy=
+setlocal balloonexpr=
+setlocal nobinary
+setlocal nobreakindent
+setlocal breakindentopt=
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
+setlocal nocindent
+setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
+setlocal cinoptions=
+setlocal cinwords=if,else,while,do,for,switch
+setlocal colorcolumn=
+setlocal comments=fb:*,fb:-,fb:+,n:>
+setlocal commentstring=>\ %s
+setlocal complete=.,w,b,u,t,i
+setlocal concealcursor=
+setlocal conceallevel=0
+setlocal completefunc=
+setlocal nocopyindent
+setlocal cryptmethod=
+setlocal nocursorbind
+setlocal nocursorcolumn
+set cursorline
+setlocal cursorline
+setlocal define=
+setlocal dictionary=
+setlocal nodiff
+setlocal equalprg=
+setlocal errorformat=
+setlocal expandtab
+if &filetype != 'markdown'
+setlocal filetype=markdown
+endif
+setlocal fixendofline
+setlocal foldcolumn=0
+setlocal foldenable
+setlocal foldexpr=0
+setlocal foldignore=#
+set foldlevel=2
+setlocal foldlevel=2
+setlocal foldmarker={{{,}}}
+set foldmethod=indent
+setlocal foldmethod=indent
+setlocal foldminlines=1
+set foldnestmax=10
+setlocal foldnestmax=10
+setlocal foldtext=foldtext()
+setlocal formatexpr=
+setlocal formatoptions=tcqln
+setlocal formatlistpat=^\\s*\\d\\+\\.\\s\\+\\|^[-*+]\\s\\+\\|^\\[^\\ze[^\\]]\\+\\]:
+setlocal formatprg=
+setlocal grepprg=
+setlocal iminsert=0
+setlocal imsearch=-1
+setlocal include=
+setlocal includeexpr=
+setlocal indentexpr=
+setlocal indentkeys=0{,0},0),0],:,0#,!^F,o,O,e
+setlocal noinfercase
+setlocal iskeyword=@,48-57,_,192-255
+setlocal keywordprg=
+set linebreak
+setlocal linebreak
+setlocal nolisp
+setlocal lispwords=
+setlocal nolist
+setlocal makeencoding=
+setlocal makeprg=
+setlocal matchpairs=(:),{:},[:],<:>
+setlocal nomodeline
+setlocal modifiable
+setlocal nrformats=bin,octal,hex
+set number
+setlocal number
+setlocal numberwidth=4
+setlocal omnifunc=htmlcomplete#CompleteTags
+setlocal path=
+setlocal nopreserveindent
+setlocal nopreviewwindow
+setlocal quoteescape=\\
+setlocal noreadonly
+setlocal norelativenumber
+setlocal norightleft
+setlocal rightleftcmd=search
+setlocal noscrollbind
+setlocal scrolloff=-1
+setlocal shiftwidth=4
+setlocal noshortname
+setlocal sidescrolloff=-1
+setlocal signcolumn=auto
+setlocal nosmartindent
+setlocal softtabstop=0
+setlocal nospell
+setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
+setlocal spellfile=
+setlocal spelllang=en
+setlocal statusline=
+setlocal suffixesadd=
+setlocal swapfile
+setlocal synmaxcol=3000
+if &syntax != 'markdown'
+setlocal syntax=markdown
+endif
+setlocal tabstop=4
+setlocal tagcase=
+setlocal tags=
+setlocal termmode=
+setlocal termwinkey=
+setlocal termwinscroll=10000
+setlocal termwinsize=
+setlocal textwidth=0
+setlocal thesaurus=
+setlocal noundofile
+setlocal undolevels=-123456
+setlocal varsofttabstop=
+setlocal vartabstop=
+setlocal nowinfixheight
+setlocal nowinfixwidth
+setlocal wrap
+setlocal wrapmargin=0
+let s:l = 137 - ((42 * winheight(0) + 22) / 45)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+137
+normal! 0
 tabnext 1
 set stal=1
 badd +1 ./pages/admin.py
@@ -1465,14 +1779,16 @@ badd +1 ./pages/models.py
 badd +1 ./pages/summarize.py
 badd +36 ./pages/urls.py
 badd +1 ./pages/utils.py
-badd +80 ./pages/views.py
+badd +99 ./pages/views.py
 badd +1 Dockerfile.armv7l.vostok
-badd +4 ~/.bash_aliases
-badd +1 templates/home.html
-badd +2 templates/base.html
+badd +5 ~/.bash_aliases
+badd +75 templates/home.html
+badd +1 templates/base.html
 badd +1 docker-compose.development.yml
 badd +14 ~/.profile
 badd +34 ~/.vimrc
+badd +0 ./templates/includes/latest_entries.html
+badd +1 ~/perfect_workspace_notes.md
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -1484,7 +1800,6 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
