@@ -1,9 +1,11 @@
 # --- dependencies for building pip-packages (lxml ...) from source
-build-essential                                                              
+build-essential
+libffi-dev
 libpq-dev 
+libssl-dev
 libxml2 
 libxml2-dev 
-libxslt1-dev 
+libxslt1-dev
 python-dev 
 libpython3-all-dev 
 zlib1g-dev
