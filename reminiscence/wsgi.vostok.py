@@ -16,5 +16,5 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "helloworld.settings")
 application = get_wsgi_application()
 
 # --- enable web debugger (wdb) - dead slow on RPi so disabled by default
-#from wdb.ext import WdbMiddleware
-#application = WdbMiddleware(application)
+from wdb.ext import WdbMiddleware
+application = WdbMiddleware(application, start_disabled=True)
