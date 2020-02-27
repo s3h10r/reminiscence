@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    volumes:
+      - .:/usr/src/reminiscence
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+  
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+      - "1984:1984"
+    volumes:
+      - ./static:/usr/src/reminiscence/static/
+      - ./archive:/usr/src/reminiscence/archive/
+      - ./logs:/usr/src/reminiscence/logs/
+      - ./backup:/usr/src/reminiscence/backup/
+      # mounting the current sources additionally allows to do code-changes
+      # "live" - every code-change on the host is automatically reflected
+      # inside the container's fs.
+      # => page-reload triggers changed code immediately. 
+      # in any case of doubt: 
+      # => reboot the containers(s) (web,nginx)
+      # and the latest changes are up'n'running for sure without rebuild. :) 
+      - ./pages:/usr/src/reminiscence/pages/
+      - ./restapi:/usr/src/reminiscence/restapi/
+      - ./templates:/usr/src/reminiscence/templates/
+    depends_on:
+      - db
+
+  db:
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    image: postgres:11
+    volumes:
+      - ./db:/var/lib/postgresql/data/
