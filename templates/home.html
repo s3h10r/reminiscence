@@ -37,10 +37,21 @@
     {% include 'includes/latest_entries.html' %}
   </div>
   <div class="col-sm">
-        <!-- TODO: improve responsiveness of UI
-             (ajax/django-channels to show status
-             of current running tasks
-             (archiving entry, ,edia download, ...) -->
+    <div align="center"> 
+      <a href="#" data-toggle="collapse" data-target="#id-stats" aria-expanded="true" aria-controls="id-stats">
+       stats
+      </a>
+    </div>
+
+    <div class="collapse show" id="id-stats">
+      #TODO
+      entries: nnn; latest: nnn, oldest: nnn; tags: nnn; dirs: nnn; storage-capacity used: nnn GB
+    </div>  
+    
+      <!-- TODO: improve responsiveness of UI
+           (ajax/django-channels to show status
+           of current running tasks
+           (archiving entry, ,edia download, ...) -->
     <div align="center"> 
       <a href="#" data-toggle="collapse" data-target="#id-task_list" aria-expanded="true" aria-controls="id-task_list">
         tasks running
