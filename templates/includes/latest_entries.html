@@ -1,0 +1,26 @@
+<div align="center">
+  <a href="#" data-toggle="collapse" data-target="#id-latest_entries_list" aria-expanded="true" aria-controls="id-latest_entries_list">
+     latest {{latest_entries_list|length}} entries
+  </a>
+</div>
+<div class="collapse show" id="id-latest_entries_list">
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">title</th>
+      <th scope="col">directory</th>
+      <th scope="col">time</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for e in latest_entries_list %}
+    <tr>
+      <td> <a href="{{e.url}}">{{e.title|truncatechars:"78"}}</a> </td>
+      <td> {{e.directory}} bla {{e.media_path_}}</td>
+      <td> {{e.timestamp|timesince}} ago </td> {# more userfriendly than `|date:"Y-m-d"` #}
+    </tr>
+    {% endfor %}
+  </tbody>
+  </table>
+</div>
+
