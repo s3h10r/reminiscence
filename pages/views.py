@@ -56,6 +56,9 @@ from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
+def _get_stats(user=None):
+    raise Exception("Sry, TODO")
+
 def _get_latest_entries(n=10,user=None):
     """
     return n latest Library entries for usr (or overall if user = None)
