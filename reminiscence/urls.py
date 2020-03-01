@@ -39,3 +39,16 @@ urlpatterns = [
 ]
 
 urlpatterns += staticfiles_urlpatterns()
+
+import debug_toolbar
+if settings.DEBUG:
+    ENABLE_DEBUG_TOOLBAR=True
+    try:
+        import debug_toolbar
+    except:
+        ENABLE_DEBUG_TOOLBAR=False
+    if ENABLE_DEBUG_TOOLBAR:
+        urlpatterns += [
+            path('__debug__/', include(debug_toolbar.urls)),
+        ]
+
