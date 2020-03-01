@@ -37,21 +37,19 @@ services:
 
   db:
     image: postgres:11
-    ports:
     environment:
         - POSTGRES_HOST_AUTH_METHOD=trust
-    image: postgres:11
     volumes:
       - ./db:/var/lib/postgresql/data/
 
-   #inprogress... db-setup with password
-   db-fixme:
-     image: postgres:11
-     ports:
-       - "5432:5432"
-     environment:
-       - POSTGRES_USER='postgres'
-       - POSTGRES_PASSWORD='g3h3!m'
-       - POSTGRES_DB='postgres'
-      volumes:
-        - ./db-fixme:/var/lib/postgresql/data/    
+  db-fixme:
+    image: 
+      postgres:11
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER='postgres'
+      - POSTGRES_PASSWORD='g3h3!m'
+      - POSTGRES_DB='postgres'
+    volumes:
+      - ./db-fixme:/var/lib/postgresql/data/    
