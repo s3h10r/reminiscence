@@ -27,6 +27,7 @@ SECRET_KEY = '<Enter Secret Key Here>'
 # SECURITY WARNING: don't run with debug turned on in production!
 
 DEBUG = True
+DEBUG_PROPAGATE_EXCEPTIONS = True  # necessary for wdb
 
 ALLOWED_HOSTS = ['*']
 
@@ -241,7 +242,7 @@ DOWNLOAD_MANAGERS_ALLOWED = ['curl', 'wget']
 #Path to chromium executable or name of executable.
 #In some distro like ubuntu name of chromium executable is "chromium-browser".
 #So write it accordingly
- 
+
 CHROMIUM_COMMAND = "chromium"
 
 CHROMIUM_SANDBOX = True

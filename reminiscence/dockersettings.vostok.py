@@ -193,41 +193,6 @@ FAVICONS_STATIC = os.path.join(BASE_DIR, 'static', 'favicons')
 
 DEFAULT_FAVICON_PATH = os.path.join(BASE_DIR, 'static', 'archive.svg')
 
-# --- Django Debug Toolbar
-if DEBUG:
-    # the toolbar is shown only if your IP address is listed
-    # in the INTERNAL_IPS setting.
-    # btw. `print(request.META['REMOTE_ADDR'])` could be used in a view
-    # and see the console output to know your container's IP address
-    INTERNAL_IPS = ('127.0.0.1','172.19.0.1', '172.20.0.1', '172.18.0.1','172.17.0.1','192.168.178.48')
-    MIDDLEWARE += (
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    )
-
-    INSTALLED_APPS += (
-        'debug_toolbar',
-    )
-
-    DEBUG_TOOLBAR_PANELS = [
-        'debug_toolbar.panels.versions.VersionsPanel',
-        'debug_toolbar.panels.timer.TimerPanel',
-        'debug_toolbar.panels.settings.SettingsPanel',
-        'debug_toolbar.panels.headers.HeadersPanel',
-        'debug_toolbar.panels.request.RequestPanel',
-        'debug_toolbar.panels.sql.SQLPanel',
-        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
-        'debug_toolbar.panels.templates.TemplatesPanel',
-        'debug_toolbar.panels.cache.CachePanel',
-        'debug_toolbar.panels.signals.SignalsPanel',
-        'debug_toolbar.panels.logging.LoggingPanel',
-        'debug_toolbar.panels.redirects.RedirectsPanel',
-        'debug_toolbar.panels.profiling.ProfilingPanel',
-    ]
-    DEBUG_TOOLBAR_CONFIG = {
-        'INTERCEPT_REDIRECTS': False,
-    }
-# ---
-
 LOGOUT_REDIRECT_URL = 'home'
 
 LOGIN_REDIRECT_URL = 'home'
@@ -282,3 +247,46 @@ DOWNLOAD_MANAGERS_ALLOWED = ['curl', 'wget', 'youtube-dl']
 CHROMIUM_COMMAND = "chromium"
 
 CHROMIUM_SANDBOX = False
+# --- Django Debug Toolbar
+
+if DEBUG:
+    def custom_show_toolbar(arg=None):
+        """
+        shows django-debug-toolbar for anyone (!) if DEBUG=True #quickfix
+        """
+        return bool(DEBUG)
+
+
+    # the toolbar is shown only if your IP address is listed
+    # in the INTERNAL_IPS setting.
+    # btw. `print(request.META['REMOTE_ADDR'])` could be used in a view
+    # and see the console output to know your container's IP address
+    INTERNAL_IPS = ('127.0.0.1','172.19.0.1', '172.20.0.1', '172.18.0.1','172.17.0.1','192.168.178.48')
+    MIDDLEWARE += (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    )
+
+    INSTALLED_APPS += (
+        'debug_toolbar',
+    )
+
+    DEBUG_TOOLBAR_PANELS = [
+        'debug_toolbar.panels.versions.VersionsPanel',
+        'debug_toolbar.panels.timer.TimerPanel',
+        'debug_toolbar.panels.settings.SettingsPanel',
+        'debug_toolbar.panels.headers.HeadersPanel',
+        'debug_toolbar.panels.request.RequestPanel',
+        'debug_toolbar.panels.sql.SQLPanel',
+        'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+        'debug_toolbar.panels.templates.TemplatesPanel',
+        'debug_toolbar.panels.cache.CachePanel',
+        'debug_toolbar.panels.signals.SignalsPanel',
+        'debug_toolbar.panels.logging.LoggingPanel',
+        'debug_toolbar.panels.redirects.RedirectsPanel',
+        'debug_toolbar.panels.profiling.ProfilingPanel',
+    ]
+    DEBUG_TOOLBAR_CONFIG = {
+        'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+        'INTERCEPT_REDIRECTS': False,
+    }
+# ---
