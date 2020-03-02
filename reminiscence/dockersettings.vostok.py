@@ -141,11 +141,11 @@ WSGI_APPLICATION = 'reminiscence.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': os.environ.get('DB_NAME','postgres'),
+        'USER': os.environ.get('DB_USER','postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD','password'),
+        'HOST': os.environ.get('DB_HOST','db'),
+        'PORT': os.environ.get('DP_PORT',5432),
     }
 }
 
@@ -278,7 +278,7 @@ DOWNLOAD_MANAGERS_ALLOWED = ['curl', 'wget', 'youtube-dl']
 #Path to chromium executable or name of executable.
 #In some distro like ubuntu name of chromium executable is "chromium-browser".
 #So write it accordingly
- 
+
 CHROMIUM_COMMAND = "chromium"
 
 CHROMIUM_SANDBOX = False
