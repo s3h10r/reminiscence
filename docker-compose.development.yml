@@ -33,24 +33,14 @@ services:
       - ./restapi:/usr/src/reminiscence/restapi/
       - ./templates:/usr/src/reminiscence/templates/
     depends_on:
-      - db-fixme
+      - db
 
   db:
     image: postgres:11
-    environment:
-        - POSTGRES_HOST_AUTH_METHOD=trust
-    volumes:
-      - ./db:/var/lib/postgresql/data/
-
-  db-fixme:
-    image: 
-      postgres:11
-    ports:
-      - "5432:5432"
     environment:
         #- POSTGRES_HOST_AUTH_METHOD=trust
         - POSTGRES_USER=postgres
         - POSTGRES_PASSWORD=password
         - POSTGRES_DB=postgres
     volumes:
-      - ./db-fixme:/var/lib/postgresql/data/    
+      - ./db:/var/lib/postgresql/data/
