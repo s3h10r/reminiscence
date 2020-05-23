@@ -42,6 +42,22 @@ $ git push --force
 $ ...and so finally you can do your PR as one single commit
 ```
 
+docker 101
+----------
+
+tips for development envs:
+
+  * to get **usefull stacktraces** immediately **run stuff in foreground** (ommiting the -d flag)
+    while developing
+  * **mount the current sources directly to the container** allows **doing code-changes "live"**
+    (every code-change on the host is automatically reflected inside the container's fs then)
+    => page-reload triggers changed code immediately. 
+    in any case of doubt: 
+    => reboot the containers(s) (web,nginx)
+       and the latest changes are up'n'running for sure without rebuild. :) 
+
+misc
+
 ```
 $ docker-compose up --build -d
 
@@ -60,7 +76,9 @@ s3h10r@vostok:~/development/reminiscence $ docker exec -it reminiscence_web_1 /b
 root@9d689d7acdca:/usr/src/reminiscence# youtube-dl --version
 2020.01.24
 root@9d689d7acdca:/usr/src/reminiscence# exit
-# upgrading manually (later by update-pips.sh on boot & via cron :)
+# upgrading manually 
+# (! 1. easier : rebuilding the docker-image regularily (pip install is part of it.)
+# (  2. (just for the records) : sth. like an update-pips.sh on boot & via cron is possible too)
 root@9d689d7acdca:/usr/src/reminiscence# pip install --upgrade youtube-dl
 Collecting youtube-dl
   Downloading youtube_dl-2020.2.16-py2.py3-none-any.whl (1.8 MB)
