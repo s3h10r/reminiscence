@@ -3,7 +3,44 @@ Vostok-flavor of [Reminiscence](#):
 - armv7l architecture
 - docker-only 
 
+
 notes:
+
+```
+git 101
+-------
+
+# how to keep the master-branch up to date with upstream?
+
+$ git clone https://github.com/s3h10r/reminiscence.git
+$ git fetch upstream 
+$ git checkout master
+$ git merge upstream/master
+$ git push
+
+# how to check out this remote branch (vostok-flavour) and contribute to it?
+
+$ git clone https://github.com/s3h10r/reminiscence.git
+$ git fetch origin vostok-flavour
+$ git checkout vostok-flavor
+
+# how to make "good patches"
+
+a PR conaining one commit is easier to review and best-practice 
+(assuming there's only one person working on the patch)
+=> using --amend and push --force is your friend :
+
+$ git checkout -b patch-xyz
+$ <doing changes>
+$ git add <changed files>
+$ git commit -m "working on patch-xyz"
+$ git push
+$ <doing further changes>
+$ git add <changed files>
+$ git commit --amend
+$ git push --force
+$ ...and so finally you can do your PR as one single commit
+```
 
 ```
 $ docker-compose up --build -d
