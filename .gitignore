@@ -6,8 +6,11 @@ Session.vim
 __pycache__/
 archive/
 backup/
+static/admin/
+static/debug_toolbar/
 static/favicons/
 static/nltk_data/
+static/rest_framework/
 db/
 logs/
 tmp/

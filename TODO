@@ -1,0 +1,4 @@
+[X] enable debug toolbar
+[X] show latest N entries on home-view
+[ ] django-channels patch
+[ ] ?upgrade django to latest LTS
