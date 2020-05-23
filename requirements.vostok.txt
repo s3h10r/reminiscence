@@ -26,7 +26,7 @@ six==1.11.0
 sqlparse==0.3.0
 vine==1.1.4
 yarl==1.2.6
-youtube_dl==2020.1.24
+youtube_dl>=2020.1.24
 
 # --- for debugging / development
 django-debug-toolbar
