@@ -41,7 +41,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-import wdb
+#import wdb #web debugger is cool but dead-slow on RPi, so disabled for now
 
 from vinanti import Vinanti
 from bs4 import BeautifulSoup
