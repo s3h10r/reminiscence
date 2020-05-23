@@ -27,8 +27,15 @@ services:
       - db
 
   db:
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
     image: postgres:11
     env_file:
       - ./docker.env
+    # instead of using the env_file above for providing db-user-credentials 
+    # you also could use the following insecure setting (not recommended)  
+    # may come handy if you're experiencing db-connection problems after upgrade.
+    #environment:
+    #  - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./db:/var/lib/postgresql/data/
