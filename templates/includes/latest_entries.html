@@ -16,7 +16,7 @@
     {% for e in latest_entries_list %}
     <tr>
         <td> <a href="{% url 'read_link' e.usr e.directory e.id %}">{{e.title|truncatechars:"78"}} </a> </td>
-      <td> {{e.directory}}</td>
+        <td> <a href="{% url 'navigate_directory' e.usr e.directory %}"> {{e.directory}} </a></td>
       <td> {{e.timestamp|timesince}} ago </td> {# more userfriendly than `|date:"Y-m-d"` #}
     </tr>
     {% endfor %}
