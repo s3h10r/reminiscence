@@ -66,8 +66,9 @@ CONTAINER ID        IMAGE                   COMMAND                  CREATED    
 18e11a327d23        reminiscence_nginx      "nginx -g 'daemon of…"   6 minutes ago       Up 3 minutes           0.0.0.0:80->80/tcp       reminiscence_nginx_1
 9d689d7acdca        reminiscence_web        "/usr/src/reminiscen…"   6 minutes ago       Up 3 minutes           0.0.0.0:8000->8000/tcp   reminiscence_web_1
 766886b214f2        postgres:11             "docker-entrypoint.s…"   5 hours ago         Up 3 minutes           5432/tcp                 reminiscence_db_1
+```
 
-
+```
 # jump into the container by opening a shell
 $ docker exec -it reminiscence_web_1 /bin/bash
 
@@ -91,3 +92,11 @@ Installing collected packages: youtube-dl
 Successfully installed youtube-dl-2020.2.16
 root@9d689d7acdca:/usr/src/reminiscence# exit
 ```
+
+```
+show logs of last startet container
+-----------------------------------
+$ docker logs $(docker ps -lq)
+```
+
+
