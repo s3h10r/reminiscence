@@ -14,9 +14,28 @@
   </thead>
   <tbody>
     {% for e in latest_entries_list %}
+    {# --- #HOTFIX-200706 --- #}
     <tr>
-        <td> <a href="{% url 'read_link' e.usr e.directory e.id %}">{{e.title|truncatechars:"78"}} </a> </td>
-        <td> <a href="{% url 'navigate_directory' e.usr e.directory %}"> {{e.directory}} </a></td>
+        <td>
+            {% if not '/' in e.directory %}
+                <a href="{% url 'read_link' username=e.usr.username directory=e.directory url_id=e.id %}">{{e.title|truncatechars:"78"}} </a>
+            {% else %}
+                <a href="https://github.com/s3h10r/reminiscence/issues/4">FIXME #4</a>
+                <code>e.directory={{e.directory}} e.subdir={{e.subdir}} e.id={{e.id}}</code>
+{% comment %}
+                <a href="{% url 'read_link' username=e.usr.username directory='subdir/'|add:e.directory url_id=e.id %}">{{e.title|truncatechars:"78"}} </a>
+                <a href="{% url 'read_link' username=e.usr.username directory='subdir/software/emulators/test/' url_id='517' %}">{{e.title|truncatechars:"78"}} </a>
+{% endcomment %}
+            {% endif %}
+        </td>
+        <td>
+            {% if not '/' in e.directory %}
+                <a href="{% url 'navigate_directory' e.usr e.directory %}"> {{e.directory}} </a>
+            {% else %}
+                <a href="{% url 'navigate_subdir' username=e.usr.username directory=e.directory %}"> {{e.directory}} </a>
+            {% endif %}
+           
+        </td>
       <td> {{e.timestamp|timesince}} ago </td> {# more userfriendly than `|date:"Y-m-d"` #}
     </tr>
     {% endfor %}
