@@ -99,4 +99,16 @@ show logs of last startet container
 $ docker logs $(docker ps -lq)
 ```
 
+```
+# get all container names
+docker ps --format "{{.Names}}"
 
+# view container for front end
+docker ps -f "name=zabbix-web-nginx"
+
+# get container id using name
+docker ps -f "name=zabbix-web-nginx" --format "{{.ID}}"
+
+# gets IP address of nginx front end, specify network
+docker inspect $(docker ps -f "name=zabbix-web-nginx" --format "{{.ID}}") --format='{{ (index .NetworkSettings.Networks "zabbix-docker_zbx_net_frontend").IPAddress }}'
+```

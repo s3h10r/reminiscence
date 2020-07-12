@@ -40,10 +40,8 @@ urlpatterns = [
 
 urlpatterns += staticfiles_urlpatterns()
 
-import debug_toolbar
 if settings.DEBUG:
     ENABLE_DEBUG_TOOLBAR=True
-    import debug_toolbar
     try:
         import debug_toolbar
     except:
