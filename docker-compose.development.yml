@@ -31,7 +31,7 @@ services:
       # => page-reload triggers changed code immediately. 
       # in any case of doubt: 
       # => reboot the containers(s) (web,nginx)
-      # and the latest changes are up'n'running for sure without rebuild. :) 
+      # and the latest changes are up'n'running without rebuild (`docker-compose up --build [-d]`). :) 
       - ./pages:/usr/src/reminiscence/pages/
       - ./restapi:/usr/src/reminiscence/restapi/
       - ./templates:/usr/src/reminiscence/templates/
