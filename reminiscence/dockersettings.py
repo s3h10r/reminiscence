@@ -93,7 +93,8 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication'
     ],
 }
 
@@ -242,7 +243,6 @@ DOWNLOAD_MANAGERS_ALLOWED = ['curl', 'wget']
 #Path to chromium executable or name of executable.
 #In some distro like ubuntu name of chromium executable is "chromium-browser".
 #So write it accordingly
- 
 CHROMIUM_COMMAND = "chromium"
 
 CHROMIUM_SANDBOX = False

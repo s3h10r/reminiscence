@@ -10,23 +10,45 @@ from pages.models import Library, Tags, URLTags, UserSettings
 
 
 class AddURL(APIView):
-    
+
     permission_classes = (IsAuthenticated,)
-    
+
     def post(self, request):
+        content = self._process_payload(request)
+        return Response(content)
+
+    def get(self,request):
+        content = self._process_payload(request)
+        return Response(content)
+
+    def _process_payload(self, request):
         usr = request.user
-        url = request.POST.get("url")
-        media_link = request.POST.get("media_link")
+        if request.method == 'POST':
+            url = request.POST.get("url")
+            media_link = request.POST.get("media_link")
+            if media_link and media_link == "yes":
+                is_media_link = True
+            else:
+                is_media_link = False
+            directory = request.POST.get("directory")
+            save_favicon = request.POST.get("save_favicon")
+        else:
+            url = request.GET.get("url")
+            media_link = request.GET.get("media_link")
+            if media_link and media_link == "yes":
+                is_media_link = True
+            else:
+                is_media_link = False
+            directory = request.GET.get("directory")
+            save_favicon = request.GET.get("save_favicon")
         if media_link and media_link == "yes":
             is_media_link = True
         else:
             is_media_link = False
-        directory = request.POST.get("directory")
         if directory and directory.startswith("/"):
             directory = directory[1:]
-        save_favicon = request.POST.get("save_favicon")
         if save_favicon and save_favicon == "no":
-            save_favicon = False
+             save_favicon = False
         else:
             save_favicon = True
         row = UserSettings.objects.filter(usrid=request.user)
@@ -34,7 +56,7 @@ class AddURL(APIView):
             http = re.match(r'^(?:http)s?://', url)
         else:
             http = None
-        
+
         if http and directory:
             if self.check_dir_and_subdir(usr, directory):
                 dbxs.add_new_url(usr, request, directory, row, is_media_link=is_media_link,
@@ -45,7 +67,7 @@ class AddURL(APIView):
         else:
             content = {"msg": "wrong url format or directory"}
 
-        return Response(content)
+        return content
 
     def check_dir_and_subdir(self, usr, dirname):
         if dirname.startswith("/"):
@@ -60,7 +82,7 @@ class AddURL(APIView):
         else:
             self.verify_or_create_parent_directory(usr, dirname)
             return True
-            
+
     def verify_or_create_subdirectory(self, usr, pdir, subdir):
         if pdir and subdir:
             dirname = re.sub(r'/|:|#|\?|\\\\|\%', '-', subdir)
@@ -79,14 +101,14 @@ class AddURL(APIView):
                         else:
                             qlist.subdir = subdir
                             qlist.save()
-                        
+
     def verify_parent_directory(self, usr, dirname):
         qdir = Library.objects.filter(usr=usr, directory=dirname)
         if not qdir:
             return False
         else:
             return True
-            
+
     def verify_or_create_parent_directory(self, usr, dirname):
         dirname = re.sub(r'/|:|#|\?|\\\\|\%', '-', dirname)
         if dirname and not self.verify_parent_directory(usr, dirname):
@@ -94,7 +116,7 @@ class AddURL(APIView):
 
 
 class ListDirectories(APIView):
-    
+
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
@@ -105,7 +127,7 @@ class ListDirectories(APIView):
 
 
 class ListURL(APIView):
-    
+
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, format=None):
@@ -122,9 +144,9 @@ class ListURL(APIView):
 
 
 class Logout(APIView):
-    
+
     permission_classes = (IsAuthenticated,)
-    
+
     def get(self, request, format=None):
         request.user.auth_token.delete()
         return Response(status=200)
